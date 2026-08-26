@@ -3,10 +3,12 @@ const bcrypt = require("bcrypt");
 const User = require("../models/usermodel");
 const jwt = require("jsonwebtoken");
 const router = express.Router();
+const authMiddleware = require("../middlewares/authMiddleware");
 
+// Register
 router.post("/register", async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password } = req.body;
     if (!name || !email || !password) {
       return res.status(400).json({
         message: "Name, email and password are required",
@@ -24,7 +26,7 @@ router.post("/register", async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      role: role || "student",
+      role: "student",
     });
 
     await user.save();
@@ -39,6 +41,7 @@ router.post("/register", async (req, res) => {
   }
 });
 
+// Login
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -92,4 +95,33 @@ router.post("/login", async (req, res) => {
   }
 });
 
+// User auth
+router.get("/me", authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      user,
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      message: "Server error",
+    });
+  }
+});
+
+// Logout user
+router.post("/logout", (req, res) => {
+  res.status(200).json({
+    message: "Logout successful",
+  });
+});
 module.exports = router;
