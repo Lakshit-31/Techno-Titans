@@ -1,0 +1,11 @@
+const router = require("express").Router();
+const auth = require("../middlewares/authMiddleware");
+const { requireAdmin } = require("../middlewares/roleMiddleware");
+const admin = require("../controllers/adminController");
+const events = require("../controllers/eventController");
+router.use(auth, requireAdmin);
+router.get("/dashboard", admin.dashboard);
+router.get("/bookings", admin.listBookings);
+router.get("/users", admin.listUsers);
+router.get("/events", events.listEvents);
+module.exports = router;

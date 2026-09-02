@@ -23,8 +23,8 @@ const userSchema = new mongoose.Schema(
 
     role: {
       type: String,
-      enum: ["student", "user", "admin"],
-      default: "student",
+      enum: ["user", "event_manager"],
+      default: "user",
     },
 
     profileImage: {
@@ -36,5 +36,12 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   },
 );
+
+userSchema.set("toJSON", {
+  transform: (_doc, ret) => {
+    delete ret.password;
+    return ret;
+  },
+});
 
 module.exports = mongoose.model("User", userSchema);

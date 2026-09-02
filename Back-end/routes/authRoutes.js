@@ -2,16 +2,22 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const User = require("../models/usermodel");
 const jwt = require("jsonwebtoken");
+const authMiddleware = require("../middlewares/authMiddleware");
 const router = express.Router();
 const authMiddleware = require("../middlewares/authMiddleware");
 
 // Register
 router.post("/register", async (req, res) => {
   try {
+<<<<<<< Updated upstream
     const { name, email, password } = req.body;
     if (!name || !email || !password) {
+=======
+    const { name, email, password, role } = req.body;
+    if (!name || !email || !password || !/^\S+@\S+\.\S+$/.test(email) || password.length < 8) {
+>>>>>>> Stashed changes
       return res.status(400).json({
-        message: "Name, email and password are required",
+        message: "Provide a name, valid email, and password of at least 8 characters",
       });
     }
     const existingUser = await User.findOne({ email });
@@ -22,11 +28,16 @@ router.post("/register", async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    const userRole = role === "event_manager" ? "event_manager" : "user";
     const user = new User({
       name,
       email,
       password: hashedPassword,
+<<<<<<< Updated upstream
       role: "student",
+=======
+      role: userRole,
+>>>>>>> Stashed changes
     });
 
     await user.save();
@@ -34,7 +45,7 @@ router.post("/register", async (req, res) => {
       message: "User registered successfully",
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({
       message: "Server error",
     });
@@ -72,7 +83,7 @@ router.post("/login", async (req, res) => {
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: "1h",
+        expiresIn: "1d",
       },
     );
 
@@ -87,14 +98,14 @@ router.post("/login", async (req, res) => {
       },
     });
   } catch (error) {
-    console.log(error);
-
+    console.error(error);
     res.status(500).json({
       message: "Server error",
     });
   }
 });
 
+<<<<<<< Updated upstream
 // User auth
 router.get("/me", authMiddleware, async (req, res) => {
   try {
@@ -124,4 +135,18 @@ router.post("/logout", (req, res) => {
     message: "Logout successful",
   });
 });
+=======
+router.get("/me", authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+>>>>>>> Stashed changes
 module.exports = router;

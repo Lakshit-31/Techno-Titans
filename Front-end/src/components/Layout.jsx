@@ -1,0 +1,5 @@
+import { Link, NavLink, Outlet } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+export const Header = () => { const { user, logout } = useAuth(); return <header><Link className="brand" to="/">◈ EventHub</Link><nav><NavLink to="/">Events</NavLink>{user && <NavLink to="/bookings">My tickets</NavLink>}{user?.role === "admin" && <NavLink to="/admin">Admin</NavLink>}{user ? <button className="link" onClick={logout}>↪ Sign out</button> : <><NavLink to="/login">Sign in</NavLink><Link className="button small" to="/register">Get started</Link></>}</nav></header>; };
+export const SiteLayout = () => <><Header /><main><Outlet /></main></>;
+export const AdminLayout = () => <div className="admin-shell"><aside><Link className="brand" to="/">◈ EventHub</Link><p className="overline">Admin workspace</p><NavLink end to="/admin">▦ Overview</NavLink><NavLink to="/admin/events">◷ Events</NavLink><NavLink to="/admin/bookings">◇ Bookings</NavLink><NavLink to="/admin/users">♙ Customers</NavLink></aside><section className="admin-content"><Header /><Outlet /></section></div>;
